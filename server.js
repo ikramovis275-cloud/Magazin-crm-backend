@@ -54,6 +54,17 @@ app.get('/ping', (req, res) => {
     res.status(200).send('pong');
 });
 
+// Manual db init endpoint for debugging
+app.get('/initdb', async (req, res) => {
+    try {
+        const { initDB } = require('./db');
+        await initDB();
+        res.status(200).send('DB Initialized successfully');
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
