@@ -48,7 +48,24 @@ app.use('/api/sales', saleRoutes);
 app.use('/api/reports', reportRoutes);
 
 const PORT = process.env.PORT || 5000;
+
+// Simple ping endpoint to check if server is alive
+app.get('/ping', (req, res) => {
+    res.status(200).send('pong');
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+    
+    // Auto-ping to prevent Render from sleeping
+    const url = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+    setInterval(() => {
+        const http = url.startsWith('https') ? require('https') : require('http');
+        http.get(`${url}/ping`, (res) => {
+            console.log(`[Self-Ping] Waking up the server - Status: ${res.statusCode}`);
+        }).on('error', (err) => {
+            console.error(`[Self-Ping Error]: ${err.message}`);
+        });
+    }, 2 * 60 * 1000); // 2 minutes (har 2 minutda, 2 sekund qilsa Render bloklaydi)
 });
