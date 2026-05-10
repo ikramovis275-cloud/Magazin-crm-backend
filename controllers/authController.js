@@ -5,10 +5,10 @@ const jwt = require('jsonwebtoken');
 const login = async (req, res) => {
     const { username, password } = req.body;
     try {
-        const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+        const result = await pool.query('SELECT * FROM magazin_users WHERE username = $1', [username]);
         if (result.rows.length === 0) {
             // First time login - create admin user if no users exist
-            const allUsers = await pool.query('SELECT * FROM users');
+            const allUsers = await pool.query('SELECT * FROM magazin_users');
             if (allUsers.rows.length === 0) {
                 const hashedPassword = await bcrypt.hash(password, 10);
                 await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);

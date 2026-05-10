@@ -8,7 +8,7 @@ const getDailyReports = async (req, res) => {
                 SUM(som) as total_som,
                 SUM(usd) as total_usd,
                 SUM(quantity) as total_quantity
-            FROM sales
+            FROM magazin_sales
             GROUP BY DATE(created_at)
             ORDER BY DATE(created_at) DESC
         `);
@@ -25,12 +25,12 @@ const getDashboardStats = async (req, res) => {
                 SUM(som) as total_som, 
                 SUM(usd) as total_usd, 
                 SUM(quantity) as total_quantity 
-            FROM sales
+            FROM magazin_sales
         `);
         const todaySalesRes = await pool.query(`
             SELECT s.*, p.name as product_name, p.code as product_code 
-            FROM sales s 
-            JOIN products p ON s.product_id = p.id 
+            FROM magazin_sales s 
+            JOIN magazin_products p ON s.product_id = p.id 
             WHERE DATE(s.created_at) = CURRENT_DATE
         `);
         

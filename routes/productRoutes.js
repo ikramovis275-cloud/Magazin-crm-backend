@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { addProduct, getProducts, getProductByCode, restockProduct } = require('../controllers/productController');
+const { addProduct, getProducts, getProductByCode, restockProduct, deleteProduct } = require('../controllers/productController');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
@@ -66,6 +66,7 @@ router.get('/', getProducts);
  *         description: Product info
  */
 router.patch('/:id/restock', restockProduct);
+router.delete('/:id', deleteProduct);
 
 router.get('/:code', getProductByCode);
 

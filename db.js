@@ -20,13 +20,13 @@ const initDB = async () => {
     try {
         const client = await pool.connect();
         await client.query(`
-            CREATE TABLE IF NOT EXISTS users (
+            CREATE TABLE IF NOT EXISTS magazin_users (
                 id SERIAL PRIMARY KEY,
                 username VARCHAR(50) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL
             );
 
-            CREATE TABLE IF NOT EXISTS products (
+            CREATE TABLE IF NOT EXISTS magazin_products (
                 id SERIAL PRIMARY KEY,
                 code VARCHAR(100) UNIQUE NOT NULL,
                 name VARCHAR(255) NOT NULL,
@@ -42,9 +42,9 @@ const initDB = async () => {
                 image_url VARCHAR(255)
             );
 
-            CREATE TABLE IF NOT EXISTS sales (
+            CREATE TABLE IF NOT EXISTS magazin_sales (
                 id SERIAL PRIMARY KEY,
-                product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+                product_id INTEGER REFERENCES magazin_products(id) ON DELETE CASCADE,
                 quantity REAL NOT NULL,
                 area REAL DEFAULT 0,
                 som REAL NOT NULL,

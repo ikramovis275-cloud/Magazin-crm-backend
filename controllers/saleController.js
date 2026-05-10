@@ -23,7 +23,7 @@ const addSale = async (req, res) => {
             }
 
             const productRes = await client.query(
-                'SELECT id, name, quantity, total_area, sale_som, sale_usd FROM products WHERE id = $1',
+                'SELECT id, name, quantity, total_area, sale_som, sale_usd FROM magazin_products WHERE id = $1',
                 [product_id]
             );
             if (productRes.rows.length === 0) throw new Error(`Mahsulot (ID: ${product_id}) topilmadi!`);
@@ -36,14 +36,14 @@ const addSale = async (req, res) => {
 
             // Simple update to avoid CASE/COALESCE complexity for now
             await client.query(`
-                UPDATE products 
+                UPDATE magazin_products 
                 SET quantity = quantity - $1, 
                     total_area = CASE WHEN total_area IS NULL THEN 0 ELSE total_area - $2 END
                 WHERE id = $3
             `, [sell_qty, sell_area, product_id]);
 
             const saleRes = await client.query(`
-                INSERT INTO sales (product_id, quantity, area, som, usd)
+                INSERT INTO magazin_sales (product_id, quantity, area, som, usd)
                 VALUES ($1, $2, $3, $4, $5) RETURNING *
             `, [product_id, sell_qty, sell_area, t_som, t_usd]);
 
@@ -65,8 +65,8 @@ const getSales = async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT s.*, p.name as product_name, p.code as product_code, p.image_url 
-            FROM sales s 
-            JOIN products p ON s.product_id = p.id 
+            FROM magazin_sales s 
+            JOIN magazin_products p ON s.product_id = p.id 
             ORDER BY s.created_at DESC
         `);
         res.json(result.rows);

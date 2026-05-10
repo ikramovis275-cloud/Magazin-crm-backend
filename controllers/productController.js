@@ -7,7 +7,7 @@ const addProduct = async (req, res) => {
         const image_url = req.file ? `/uploads/${req.file.filename}` : null;
 
         const result = await pool.query(`
-            INSERT INTO products 
+            INSERT INTO magazin_products 
             (code, name, size, quantity, cost_usd, cost_som, sale_usd, sale_som, dollar_rate, category, total_area, image_url)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
             RETURNING *
@@ -26,7 +26,7 @@ const getProducts = async (req, res) => {
         if (search) {
             // Search by name, code or category
             result = await pool.query(
-                `SELECT * FROM products WHERE 
+                `SELECT * FROM magazin_products WHERE 
                     name ILIKE $1 OR 
                     code ILIKE $1 OR 
                     category ILIKE $1
@@ -34,7 +34,7 @@ const getProducts = async (req, res) => {
                 [`%${search}%`]
             );
         } else {
-            result = await pool.query('SELECT * FROM products ORDER BY id DESC');
+            result = await pool.query('SELECT * FROM magazin_products ORDER BY id DESC');
         }
         res.json(result.rows);
     } catch (error) {
@@ -45,7 +45,7 @@ const getProducts = async (req, res) => {
 const getProductByCode = async (req, res) => {
     try {
         const { code } = req.params;
-        const result = await pool.query('SELECT * FROM products WHERE code = $1', [code]);
+        const result = await pool.query('SELECT * FROM magazin_products WHERE code = $1', [code]);
         if (result.rows.length === 0) return res.status(404).json({ message: 'Product not found' });
         res.json(result.rows[0]);
     } catch (error) {
@@ -61,7 +61,7 @@ const restockProduct = async (req, res) => {
         if (!qty || qty <= 0) return res.status(400).json({ message: "Miqdor noto'g'ri" });
 
         const result = await pool.query(
-            `UPDATE products 
+            `UPDATE magazin_products 
              SET quantity = quantity + $1,
                  total_area = CASE WHEN size IS NOT NULL AND size > 0 AND size <= 10
                                    THEN (quantity + $1) * size
@@ -76,4 +76,14 @@ const restockProduct = async (req, res) => {
     }
 };
 
-module.exports = { addProduct, getProducts, getProductByCode, restockProduct };
+const deleteProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await pool.query('DELETE FROM magazin_products WHERE id = $1', [id]);
+        res.json({ message: "Product deleted" });
+    } catch (error) {
+        res.status(500).json({ message: 'Delete error', error: error.message });
+    }
+};
+
+module.exports = { addProduct, getProducts, getProductByCode, restockProduct, deleteProduct };
