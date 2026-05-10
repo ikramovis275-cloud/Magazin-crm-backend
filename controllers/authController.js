@@ -11,7 +11,7 @@ const login = async (req, res) => {
             const allUsers = await pool.query('SELECT * FROM magazin_users');
             if (allUsers.rows.length === 0) {
                 const hashedPassword = await bcrypt.hash(password, 10);
-                await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
+                await pool.query('INSERT INTO magazin_users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
                 const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1d' });
                 return res.json({ token, message: 'Admin created and logged in' });
             }
