@@ -3,6 +3,11 @@ const multer = require('multer');
 const { addProduct, getProducts, getProductByCode, restockProduct } = require('../controllers/productController');
 const router = express.Router();
 const path = require('path');
+const fs = require('fs');
+
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads', { recursive: true });
+}
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, 'uploads/'),
